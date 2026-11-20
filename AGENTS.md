@@ -1,3 +1,151 @@
+MANDATORY ENGINEERING RULES — PS4 HOMEBREW PROJECT
+
+You are working on a real PlayStation 4 homebrew project.
+
+Your highest priority is producing a package that actually runs on physical PS4 hardware, not merely code that compiles successfully.
+
+These rules are mandatory and must be followed in every task.
+
+1. Never assume that a successful build means the application works
+
+- Compilation success does NOT prove runtime compatibility.
+- Linking success does NOT prove that all imported functions are available on the target firmware.
+- PKG creation success does NOT prove that the package can launch.
+- "pkg_validate" success does NOT prove that the SELF executable runs on a real PS4.
+- Never describe a build as working unless it has been tested on actual PS4 hardware.
+
+Always distinguish between:
+
+1. Source code validation.
+2. Compilation.
+3. Linking.
+4. SELF generation.
+5. PKG validation.
+6. Runtime execution on physical PS4.
+
+Report each stage separately.
+
+2. Mandatory pre-build inspection
+
+Before modifying anything:
+
+- Read AGENTS.md completely.
+- Inspect the existing source code and project structure.
+- Inspect the current Makefile and build scripts.
+- Inspect the OpenOrbis toolchain version and actual library contents.
+- Verify every library and function used by the project.
+- Check whether the required functions are real implementations or stubs.
+- Check the target PS4 firmware compatibility.
+- Identify existing bugs before introducing changes.
+
+Never invent APIs, library functions, compiler flags, or toolchain capabilities.
+
+3. Prevent stale builds
+
+Before every release build:
+
+- Clean all previous build artifacts.
+- Rebuild all changed source files.
+- Verify dependency tracking.
+- Verify that the final EBOOT was generated from the latest source.
+- Verify that the PKG contains that exact EBOOT.
+- Record SHA256 hashes of the EBOOT and PKG.
+- Verify TITLE_ID, APP_VER, and package metadata.
+- Never reuse an old executable accidentally.
+
+4. Mandatory runtime compatibility checks
+
+Before packaging:
+
+- Inspect ELF headers and program headers.
+- Inspect dynamic sections and DT_NEEDED entries.
+- Inspect imported and undefined symbols.
+- Verify that every required import is supported by the target environment.
+- Check global constructors, TLS, initialization order, and startup dependencies.
+- Verify memory allocation assumptions.
+- Verify filesystem paths and permissions.
+- Check all startup operations for possible crashes.
+
+Do not assume that a function is available on the PS4 merely because it exists in a desktop Linux environment or in the cross-compilation toolchain.
+
+5. Diagnose before fixing
+
+When an application crashes:
+
+- Do not randomly modify code.
+- Do not repeatedly rebuild without identifying a testable hypothesis.
+- Identify the earliest confirmed failure point.
+- Use persistent logging and startup checkpoints.
+- Record errors before and after every major initialization stage.
+- Preserve diagnostic builds.
+- Change one suspected cause at a time.
+- Compare against a known-working OpenOrbis application built with the same toolchain.
+
+Never claim a root cause without supporting evidence.
+
+6. Mandatory independent diagnostic application
+
+Maintain a minimal diagnostic PS4 application independent of the main game.
+
+It should test, in stages:
+
+1. Process entry.
+2. Main function execution.
+3. Basic system library initialization.
+4. VideoOut initialization.
+5. Framebuffer creation.
+6. Screen output.
+7. Controller initialization.
+8. File access and persistent logging.
+
+Keep this diagnostic application separate from the main game so failures can be isolated.
+
+7. No fake fixes
+
+Forbidden practices:
+
+- Disabling error checks just to make the application continue.
+- Replacing missing functionality with empty stubs without documenting the consequences.
+- Ignoring failed initialization.
+- Hiding crashes.
+- Claiming compatibility without verification.
+- Removing important features just to achieve a successful build.
+- Changing unrelated files without justification.
+
+Every workaround must explain what it fixes, what it does not fix, and what functionality it may break.
+
+8. Mandatory testing report
+
+After every task, provide:
+
+- Exact files modified.
+- Exact changes made.
+- Root cause, if proven.
+- Remaining hypotheses, if the cause is not proven.
+- Build results.
+- PKG validation results.
+- Runtime tests actually performed.
+- Tests that still require a physical PS4.
+- SHA256 of generated packages.
+- Exact download links for generated artifacts.
+
+Use these statuses honestly:
+
+- VERIFIED: tested successfully on physical PS4.
+- BUILD VERIFIED: compilation and packaging succeeded.
+- STATICALLY VERIFIED: source or binary inspection passed.
+- NOT TESTED: requires physical hardware.
+
+9. Most important rule
+
+Never optimize for saying "Done".
+
+Optimize for correctness, reproducibility, and actual PS4 compatibility.
+
+If you cannot verify something, explicitly say that you cannot verify it.
+
+Do not introduce another code modification until you understand the previous failure and have a specific test plan.
+
 # Project memory — PS4 homebrew
 
 Everything learned building the Snake game in `ps4/`. Read this before starting
